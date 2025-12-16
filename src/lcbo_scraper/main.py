@@ -6,6 +6,7 @@ import sys
 
 import yaml
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 from rich.table import Table
 
 from lcbo_scraper import __version__
@@ -143,11 +144,23 @@ def main(args: list[str] | None = None) -> int:
     console = Console()
     products = []
 
-    with LcboScraper() as scraper:
-        for product_number in parsed_args.numbers:
+    progress = Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        TimeElapsedColumn(),
+        console=console,
+    )
+
+    total = len(parsed_args.numbers)
+    with progress, LcboScraper() as scraper:
+        for index, product_number in enumerate(parsed_args.numbers, start=1):
+            task = progress.add_task(
+                f"[{index}/{total}] Searching for product {product_number}...", total=1
+            )
             logger.info("Searching for product: %s", product_number)
             product = scraper.get_product(product_number)
             products.append(product)
+            progress.update(task, completed=1)
 
             if product.name:
                 logger.info("Found: %s", product.name)
