@@ -1,0 +1,120 @@
+[build-system]
+requires = ["setuptools"]
+
+[project]
+name = "lcbo-scraper"
+authors = [
+    {name = "Matthew Pounsett", email = "matt@conundrum.com"}
+]
+readme = "README.md"
+requires-python = ">= 3.14"
+dependencies = [
+    'furl',
+    'httpx',
+    'pydantic-settings',
+    'rich',
+    'beautifulsoup4',
+    'pyyaml',
+]
+dynamic = ["version"]
+
+[project.scripts]
+lcbo-scraper = "lcbo_scraper.main:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "lcbo_scraper.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.optional-dependencies]
+dev = [
+    "isort",
+    "mkdocs",
+    "mkdocs-material",
+    "pymdown-extensions",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "semantic_version",
+    "setuptools",
+    "tox"
+]
+
+[dependency-groups]
+lint = [
+    "coverage",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "semantic_version",
+    "setuptools",
+]
+
+[tool.pylint."messages control"]
+max-line-length = 100
+
+[tool.ruff]
+line-length = 100
+respect-gitignore = true
+force-exclude = true
+extend-exclude = ["alembic/env.py"]
+
+[tool.ruff.lint]
+# more flake8-like
+extend-select = ["C901", "D", "E", "F", "W"]
+ignore = ["E24"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.tox]
+env_list = [
+    "clean",
+    "ruff",
+    "py314",
+    "stats"
+]
+
+[tool.tox.env.clean]
+description = "clean up old coverage data"
+commands = [["coverage", "erase"]]
+deps = ["coverage"]
+skip_install = true
+
+[tool.tox.env.pylint]
+description = "run pylint"
+commands = [["pylint", "src/lcbo_scraper", "tests"]]
+deps = ["pylint"]
+ignore_errors = true
+
+[tool.tox.env.ruff]
+description = "run ruff"
+commands = [["ruff", "check", "src/lcbo_scraper", "tests"]]
+deps = ["ruff"]
+ignore_errors = true
+
+[tool.tox.env.stats]
+description = "generate coverage report"
+commands = [
+    ["coverage", "report"],
+    ["coverage", "html"]
+]
+deps = ["coverage"]
+skip_install = true
+
+[tool.tox.env_run_base]
+description = "run unit tests"
+commands = [
+    [
+        "pytest",
+        "-v",
+        "--cov=src/lcbo_scraper",
+        "--cov-report=html",
+        "--cov-append",
+        {replace = "posargs", default = ["tests"], extend = true}
+    ]
+]
+dependency_groups = [
+    "lint"
+]
