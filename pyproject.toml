@@ -7,6 +7,7 @@ authors = [
     {name = "Matthew Pounsett", email = "matt@conundrum.com"}
 ]
 readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">= 3.14"
 dependencies = [
     'furl',
