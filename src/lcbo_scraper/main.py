@@ -118,10 +118,10 @@ def output_yaml(products: list, output_path: str) -> None:
     data = [product.model_dump() for product in products]
 
     if output_path == "-":
-        yaml.dump(data, sys.stdout, default_flow_style=False, sort_keys=False)
+        yaml.dump(data, sys.stdout, default_flow_style=False, sort_keys=False, allow_unicode=True)
     else:
-        with open(output_path, "w") as f:
-            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+        with open(output_path, "w", encoding="utf-8") as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False, allow_unicode=True)
         logger.info("Output written to: %s", output_path)
 
 
